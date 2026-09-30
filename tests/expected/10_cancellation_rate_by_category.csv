@@ -1,0 +1,5 @@
+category,orders,paid,pending,cancelled,cancellation_pct
+Home,7,6,0,1,14.3
+Electronics,10,8,1,1,10.0
+Books,6,6,0,0,0.0
+Sports,3,3,0,0,0.0

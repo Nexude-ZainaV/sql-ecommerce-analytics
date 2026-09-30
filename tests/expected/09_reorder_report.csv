@@ -1,0 +1,5 @@
+sku,name,stock_qty,reorder_level,units_sold_90d,urgency
+HM-003,Standing Desk Mat,0,5,2,out of stock
+BK-002,Designing Data-Intensive Applications,3,5,1,below reorder level
+EL-002,Mechanical Keyboard,8,10,1,below reorder level
+EL-004,Noise-Cancelling Headphones,5,5,1,at reorder level
