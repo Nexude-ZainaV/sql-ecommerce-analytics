@@ -2,12 +2,14 @@
 -- Question: who spends more per order than typical?
 -- Techniques: window AVG() OVER () next to per-group aggregates, HAVING.
 
+-- Average order value for each customer with two or more orders.
 WITH customer_aov AS (
     SELECT customer_id, COUNT(*) AS orders, AVG(order_cents) AS aov_cents
     FROM v_order_totals
     GROUP BY customer_id
     HAVING COUNT(*) >= 2          -- one order is not a pattern
 )
+-- Put each one next to the store-wide average and the gap in percent.
 SELECT
     c.full_name,
     a.orders,

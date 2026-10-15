@@ -4,10 +4,10 @@
 ![SQL](https://img.shields.io/badge/SQL-SQLite%203.35%2B-003B57?logo=sqlite)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
-A normalised store schema, a hand-checkable dataset, and ten business reports written
-in SQL: running totals, month-over-month growth, top-N per group, customer lifetime
-value, cohort retention, reorder planning and more. Every report is covered by a
-snapshot test, and invariant tests check that the numbers add up.
+A normalised store schema, a dataset small enough to check by hand, and ten business
+reports written in SQL: running totals, month-over-month growth, top-N per group,
+customer lifetime value, cohort retention, reorder planning and a few more. Each report
+has a snapshot test, and separate invariant tests check that the numbers add up.
 
 ## Schema
 
@@ -51,13 +51,16 @@ erDiagram
     }
 ```
 
-- Money is stored as **integer cents**; reports divide by 100.0 only for display.
-- `order_items.unit_price_cents` is copied at purchase time, so a price change never
-  rewrites order history.
-- `CHECK`, `UNIQUE` and foreign-key constraints reject bad data at the database, and
-  indexes cover every foreign key and the date filters.
-- Two views, `v_sales_lines` and `v_order_totals`, define "revenue" once (paid, shipped
-  or delivered orders) so every report agrees on it.
+Money is stored as integer cents, and the reports divide by 100.0 only for display.
+`order_items.unit_price_cents` is copied at purchase time, so a later price change
+doesn't rewrite order history.
+
+`CHECK`, `UNIQUE` and foreign-key constraints reject bad data in the database itself,
+and there are indexes on every foreign key and on the order date.
+
+Two views, `v_sales_lines` and `v_order_totals`, define "revenue" once (paid, shipped
+or delivered orders), so every report that sums revenue agrees on what counts. Report 10
+reads the raw tables on purpose, because it needs the cancelled orders too.
 
 ## Reports
 
@@ -88,7 +91,7 @@ Expected output for every report is in [tests/expected/](tests/expected/).
 
 ## Run it
 
-Python 3.12+ (standard library only):
+You need Python 3.12+ and nothing else (standard library only):
 
 ```bash
 python reports.py              # build an in-memory database and print every report
@@ -113,7 +116,7 @@ python -m unittest discover -s tests -v
 
 ## Porting to PostgreSQL or MySQL
 
-The window functions, CTEs and joins are standard SQL. The SQLite-specific parts are
+The window functions, CTEs and joins are standard SQL. The SQLite-specific part is
 date handling: `strftime('%Y-%m', d)` becomes `to_char(d, 'YYYY-MM')` (PostgreSQL) or
 `DATE_FORMAT(d, '%Y-%m')` (MySQL), and `date(x, '-90 days')` becomes
 `x - INTERVAL '90 days'`. Dates are stored as ISO 8601 text here; a server database

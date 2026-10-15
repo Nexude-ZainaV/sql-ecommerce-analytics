@@ -29,6 +29,7 @@ def build_database(path: str = ":memory:") -> sqlite3.Connection:
 
 
 def query_files(prefixes: list[str] | None = None) -> list[Path]:
+    """Query files in report order, optionally only those whose names start with a prefix."""
     files = sorted(QUERY_DIR.glob("*.sql"))
     if prefixes:
         files = [f for f in files if f.name.startswith(tuple(prefixes))]
@@ -36,12 +37,14 @@ def query_files(prefixes: list[str] | None = None) -> list[Path]:
 
 
 def run_query(connection: sqlite3.Connection, path: Path) -> tuple[list[str], list[tuple]]:
+    """Run one query file and return its column names and rows."""
     cursor = connection.execute(path.read_text(encoding="utf-8"))
     columns = [description[0] for description in cursor.description]
     return columns, cursor.fetchall()
 
 
 def format_table(columns: list[str], rows: list[tuple]) -> str:
+    """Render a result as a plain-text table with padded columns (NULL shows as blank)."""
     cells = [columns] + [["" if v is None else str(v) for v in row] for row in rows]
     widths = [max(len(row[i]) for row in cells) for i in range(len(columns))]
     lines = [" | ".join(value.ljust(width) for value, width in zip(row, widths, strict=True)) for row in cells]

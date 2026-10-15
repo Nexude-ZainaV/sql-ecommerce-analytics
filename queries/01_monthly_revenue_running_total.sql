@@ -6,6 +6,7 @@ SELECT
     order_month,
     COUNT(*)                                         AS orders,
     ROUND(SUM(order_cents) / 100.0, 2)               AS revenue,
+    -- The window runs over the grouped months: this month plus every month before it.
     ROUND(SUM(SUM(order_cents)) OVER (ORDER BY order_month) / 100.0, 2) AS revenue_ytd
 FROM v_order_totals
 GROUP BY order_month

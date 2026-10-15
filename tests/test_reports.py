@@ -19,6 +19,7 @@ import sys
 import unittest
 from pathlib import Path
 
+# Make reports.py importable when the tests run from the repo root.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from reports import build_database, query_files, run_query  # noqa: E402
@@ -28,6 +29,7 @@ UPDATE_SNAPSHOTS = os.environ.get("UPDATE_SNAPSHOTS") == "1"
 
 
 def to_csv(columns: list[str], rows: list[tuple]) -> str:
+    """Serialise a result exactly the way the snapshot files are written."""
     buffer = io.StringIO()
     writer = csv.writer(buffer, lineterminator="\n")
     writer.writerow(columns)

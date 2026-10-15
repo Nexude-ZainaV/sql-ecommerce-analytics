@@ -2,6 +2,7 @@
 -- Question: what are the best sellers per category?
 -- Techniques: "top N per group" with ROW_NUMBER() OVER (PARTITION BY ...).
 
+-- Units sold and revenue for each product, labelled with its category.
 WITH product_revenue AS (
     SELECT
         c.name                  AS category,
@@ -13,12 +14,14 @@ WITH product_revenue AS (
     JOIN categories c ON c.id = s.category_id
     GROUP BY c.name, p.name
 ),
+-- Each product's position inside its category (ties go to the name, alphabetically).
 ranked AS (
     SELECT
         *,
         ROW_NUMBER() OVER (PARTITION BY category ORDER BY cents DESC, product) AS rank_in_category
     FROM product_revenue
 )
+-- Keep the best two per category.
 SELECT category, rank_in_category, product, units, ROUND(cents / 100.0, 2) AS revenue
 FROM ranked
 WHERE rank_in_category <= 2

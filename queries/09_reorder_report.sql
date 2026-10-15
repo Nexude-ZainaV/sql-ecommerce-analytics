@@ -3,9 +3,11 @@
 -- Techniques: a parameter CTE (one place to change the report date), date() modifiers,
 -- LEFT JOIN + COALESCE for items with no recent sales, CASE for urgency.
 
+-- Report date and look-back window, kept in one place.
 WITH params AS (
     SELECT '2026-06-30' AS as_of, 90 AS window_days
 ),
+-- Units sold per product in the window before the report date.
 recent_sales AS (
     SELECT s.product_id, SUM(s.quantity) AS units
     FROM v_sales_lines s, params
@@ -13,6 +15,7 @@ recent_sales AS (
       AND s.ordered_at <= params.as_of
     GROUP BY s.product_id
 )
+-- Products at or below their reorder level: out of stock first, then the fastest sellers.
 SELECT
     p.sku,
     p.name,

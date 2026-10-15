@@ -2,11 +2,13 @@
 -- Question: which months grew and which shrank, by how much?
 -- Techniques: CTE, LAG() to read the previous row, NULLIF to avoid division by zero.
 
+-- Revenue per month, the base for the comparison.
 WITH monthly AS (
     SELECT order_month, SUM(order_cents) AS cents
     FROM v_order_totals
     GROUP BY order_month
 )
+-- Each month next to the one before it. The first month has no previous value.
 SELECT
     order_month,
     ROUND(cents / 100.0, 2)                                   AS revenue,

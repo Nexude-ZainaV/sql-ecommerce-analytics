@@ -3,6 +3,7 @@
 -- Techniques: LEFT JOIN to keep customers with no orders, COALESCE, DENSE_RANK(),
 -- a window SUM() over the whole result for percent-of-total.
 
+-- Order count and total spend per customer, including customers who never ordered.
 WITH per_customer AS (
     SELECT
         c.id,
@@ -14,6 +15,7 @@ WITH per_customer AS (
     LEFT JOIN v_order_totals t ON t.customer_id = c.id
     GROUP BY c.id, c.full_name, c.country
 )
+-- Rank customers by spend and show each one's share of all revenue.
 SELECT
     DENSE_RANK() OVER (ORDER BY cents DESC)          AS clv_rank,
     full_name,
